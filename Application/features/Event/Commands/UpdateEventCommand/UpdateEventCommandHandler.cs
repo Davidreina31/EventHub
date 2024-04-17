@@ -1,6 +1,6 @@
-﻿using Persistence.contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
+using Persistence.context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +11,13 @@ namespace Application.features.Event.Commands.UpdateEventCommand
 {
     public class UpdateEventCommandHandler : IRequestHandler<UpdateEventCommand, EventCommandResponse>
     {
-        private readonly IWriteRepository<Domain.Event> _repo;
+        private readonly EventHubDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public UpdateEventCommandHandler(IWriteRepository<Domain.Event> repo, IMapper mapper)
+        public UpdateEventCommandHandler(IMapper mapper, EventHubDbContext dbContext)
         {
-            _repo = repo;
             _mapper = mapper;
+            _dbContext = dbContext;
         }
 
         public async Task<EventCommandResponse> Handle(UpdateEventCommand request, CancellationToken cancellationToken)
@@ -48,7 +48,8 @@ namespace Application.features.Event.Commands.UpdateEventCommand
                     Date = request.EventDTO.Date
                 };
 
-                eventToUpdate = await _repo.Update(eventToUpdate);
+                _dbContext.Events.Update(eventToUpdate);
+                await _dbContext.SaveChangesAsync();
                 response.EventDTO = _mapper.Map<EventDTO>(eventToUpdate);
             }
 

@@ -1,7 +1,5 @@
-using Persistence.contracts;
 using Microsoft.EntityFrameworkCore;
 using Persistence.context;
-using Persistence.repositories;
 using AutoMapper;
 using Application.features.Event.Commands;
 using Application.features.Event.Queries.GetDetailedEvent;
@@ -22,9 +20,6 @@ builder.Services.AddDbContext<EventHubDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EventHubConnectionString"));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
-
-builder.Services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
-builder.Services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
 
 var configuration = new MapperConfiguration(cfg =>
 {
