@@ -1,4 +1,4 @@
-﻿using Application.contracts;
+﻿using Persistence.contracts;
 using AutoMapper;
 using MediatR;
 

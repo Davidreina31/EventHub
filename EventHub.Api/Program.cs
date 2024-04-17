@@ -1,7 +1,12 @@
-using Application.contracts;
+using Persistence.contracts;
 using Microsoft.EntityFrameworkCore;
 using Persistence.context;
 using Persistence.repositories;
+using AutoMapper;
+using Application.features.Event.Commands;
+using Application.features.Event.Queries.GetDetailedEvent;
+using Application.features.Event.Queries.GetEventList;
+using Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +25,15 @@ builder.Services.AddDbContext<EventHubDbContext>(options =>
 
 builder.Services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
 builder.Services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
+
+var configuration = new MapperConfiguration(cfg =>
+{
+    cfg.CreateMap<Event, EventListDTO>().ReverseMap();
+    cfg.CreateMap<Event, EventDetailedDTO>().ReverseMap();
+    cfg.CreateMap<Event, EventDTO>().ReverseMap();
+});
+
+var mapper = configuration.CreateMapper();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
