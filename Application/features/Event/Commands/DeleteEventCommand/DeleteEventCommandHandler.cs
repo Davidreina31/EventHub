@@ -1,4 +1,4 @@
-﻿using Application.contracts;
+﻿using Persistence.contracts;
 using MediatR;
 using System;
 using System.Collections.Generic;
