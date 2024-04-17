@@ -1,19 +1,19 @@
-﻿using Persistence.contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using Domain;
 using MediatR;
+using Persistence.context;
 
 namespace Application.features.Event.Commands.CreateEventCommand
 {
     public class CreateEventCommandHandler : IRequestHandler<CreateEventCommand, EventCommandResponse>
     {
-        private readonly IWriteRepository<Domain.Event> _repo;
         private readonly IMapper _mapper;
+        private readonly EventHubDbContext _dbContext;
 
-        public CreateEventCommandHandler(IWriteRepository<Domain.Event> repo, IMapper mapper)
+        public CreateEventCommandHandler(IMapper mapper, EventHubDbContext dbContext)
         {
-            _repo = repo;
             _mapper = mapper;
+            _dbContext = dbContext;
         }
 
         public async Task<EventCommandResponse> Handle(CreateEventCommand request, CancellationToken cancellationToken)
@@ -44,7 +44,8 @@ namespace Application.features.Event.Commands.CreateEventCommand
                     Date = request.EventDTO.Date
                 };
 
-                eventToAdd = await _repo.Create(eventToAdd);
+                await _dbContext.Events.AddAsync(eventToAdd);
+                await _dbContext.SaveChangesAsync();
                 response.EventDTO = _mapper.Map<EventDTO>(eventToAdd);
             }
 

@@ -1,23 +1,23 @@
-﻿using Persistence.contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
+using Persistence.context;
 
 namespace Application.features.Event.Queries.GetDetailedEvent
 {
     public class GetEventDetailedQueryHandler : IRequestHandler<GetEventDetailedQuery, EventDetailedDTO>
     {
-        private readonly IReadRepository<Domain.Event> _repo;
+        private readonly EventHubDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public GetEventDetailedQueryHandler(IReadRepository<Domain.Event> repo, IMapper mapper)
+        public GetEventDetailedQueryHandler(IMapper mapper, EventHubDbContext dbContext)
         {
-            _repo = repo;
             _mapper = mapper;
+            _dbContext = dbContext;
         }
 
         public async Task<EventDetailedDTO> Handle(GetEventDetailedQuery request, CancellationToken cancellationToken)
         {
-            var detailedEvent = await _repo.GetById(request.Id);
+            var detailedEvent = await _dbContext.Events.FindAsync(request.Id);
 
             return _mapper.Map<EventDetailedDTO>(detailedEvent);
         }

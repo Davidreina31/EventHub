@@ -1,5 +1,5 @@
-﻿using Persistence.contracts;
-using MediatR;
+﻿using MediatR;
+using Persistence.context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +10,19 @@ namespace Application.features.Event.Commands.DeleteEventCommand
 {
     public class DeleteEventCommandHandler : IRequestHandler<DeleteEventCommand>
     {
-        private readonly IWriteRepository<Domain.Event> _repo;
+        private readonly EventHubDbContext _dbContext;
 
-        public DeleteEventCommandHandler(IWriteRepository<Domain.Event> repo)
+        public DeleteEventCommandHandler(EventHubDbContext dbContext)
         {
-            _repo = repo;
+            _dbContext = dbContext;
         }
 
         public async Task Handle(DeleteEventCommand request, CancellationToken cancellationToken)
         {
-            await _repo.Delete(request.Id);
+            var objectToRemove = await _dbContext.Events.FindAsync(request.Id);
+
+            _dbContext.Remove(objectToRemove);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
